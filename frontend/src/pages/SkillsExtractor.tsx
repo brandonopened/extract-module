@@ -1,190 +1,140 @@
 import React, { useState } from 'react';
 import {
   Box,
-  Paper,
-  Typography,
-  TextField,
   Button,
-  Grid,
   FormControl,
   InputLabel,
-  Select,
   MenuItem,
-  CircularProgress,
+  Select,
+  Typography,
+  Paper,
   Alert,
+  CircularProgress,
+  TextField,
+  Chip,
+  Stack
 } from '@mui/material';
-import { useMutation } from '@tanstack/react-query';
-import { DataGrid } from '@mui/x-data-grid';
+import { Extension as ExtractIcon } from '@mui/icons-material';
 
-const API_URL = 'http://localhost:8000';
-
-interface Skill {
-  id: string;
-  skill: string;
-  confidence: number;
-  source: string;
-}
-
-const SkillsExtractor: React.FC = () => {
+const SkillsExtractor = () => {
   const [inputText, setInputText] = useState('');
   const [inputType, setInputType] = useState('job');
-  const [extractedSkills, setExtractedSkills] = useState<Skill[]>([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [extractedSkills, setExtractedSkills] = useState<Array<{ skill: string; confidence: number }>>([]);
 
-  const extractMutation = useMutation({
-    mutationFn: async (data: { text: string; input_type: string }) => {
-      const response = await fetch(`${API_URL}/extract-skills`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to extract skills');
-      }
-      return response.json();
-    },
-    onSuccess: (data) => {
-      setExtractedSkills(data);
-      setError(null);
-    },
-    onError: (error: Error) => {
-      setError(error.message);
-    },
-  });
-
-  const uploadMutation = useMutation({
-    mutationFn: async (file: File) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('input_type', inputType);
-
-      const response = await fetch(`${API_URL}/upload-file`, {
-        method: 'POST',
-        body: formData,
-      });
-      if (!response.ok) {
-        throw new Error('Failed to upload file');
-      }
-      return response.json();
-    },
-    onSuccess: (data) => {
-      setExtractedSkills(data);
-      setError(null);
-    },
-    onError: (error: Error) => {
-      setError(error.message);
-    },
-  });
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      uploadMutation.mutate(file);
-    }
+  const handleInputTypeChange = (event: any) => {
+    setInputType(event.target.value);
+    setError(null);
   };
 
-  const handleExtract = () => {
+  const handleExtract = async () => {
     if (!inputText.trim()) {
       setError('Please enter some text to extract skills from');
       return;
     }
-    extractMutation.mutate({ text: inputText, input_type: inputType });
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('http://localhost:8000/extract-skills', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: inputText,
+          input_type: inputType,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to extract skills');
+      }
+
+      const data = await response.json();
+      setExtractedSkills(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred while extracting skills');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const columns = [
-    { field: 'skill', headerName: 'Skill', flex: 1 },
-    { field: 'confidence', headerName: 'Confidence', width: 130 },
-    { field: 'source', headerName: 'Source', width: 130 },
-  ];
-
   return (
-    <Box sx={{ maxWidth: 1200, margin: '0 auto', p: 2 }}>
-      <Typography variant="h4" gutterBottom>
-        Extract Skills
-      </Typography>
+    <Box sx={{ p: 3, maxWidth: 800, mx: 'auto' }}>
+      <Paper sx={{ p: 3 }}>
+        <Typography variant="h5" gutterBottom>
+          Extract Skills from Text
+        </Typography>
+        
+        <Typography variant="body1" sx={{ mb: 3 }}>
+          Paste your job description, course syllabus, or resume text below to extract relevant skills.
+        </Typography>
 
-      <Paper sx={{ p: 3, mb: 3 }}>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <FormControl fullWidth>
-              <InputLabel>Input Type</InputLabel>
-              <Select
-                value={inputType}
-                label="Input Type"
-                onChange={(e) => setInputType(e.target.value)}
-              >
-                <MenuItem value="job">Job Description</MenuItem>
-                <MenuItem value="syllabus">Course Syllabus</MenuItem>
-                <MenuItem value="resume">Resume</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
+        <FormControl fullWidth sx={{ mb: 3 }}>
+          <InputLabel id="input-type-label">Source Type</InputLabel>
+          <Select
+            labelId="input-type-label"
+            value={inputType}
+            label="Source Type"
+            onChange={handleInputTypeChange}
+          >
+            <MenuItem value="job">Job Posting</MenuItem>
+            <MenuItem value="syllabus">Course Syllabus</MenuItem>
+            <MenuItem value="resume">Resume</MenuItem>
+          </Select>
+        </FormControl>
 
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              multiline
-              rows={6}
-              label="Enter text to extract skills from"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-            />
-          </Grid>
+        <TextField
+          fullWidth
+          multiline
+          rows={6}
+          variant="outlined"
+          label="Enter text"
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          sx={{ mb: 3 }}
+        />
 
-          <Grid item xs={12}>
-            <Button
-              variant="contained"
-              onClick={handleExtract}
-              disabled={extractMutation.isPending}
-              sx={{ mr: 2 }}
-            >
-              {extractMutation.isPending ? (
-                <CircularProgress size={24} />
-              ) : (
-                'Extract Skills'
-              )}
-            </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleExtract}
+          disabled={loading || !inputText.trim()}
+          startIcon={loading ? <CircularProgress size={20} /> : <ExtractIcon />}
+          fullWidth
+        >
+          {loading ? 'Extracting Skills...' : 'Extract Skills'}
+        </Button>
 
-            <Button
-              variant="outlined"
-              component="label"
-              disabled={uploadMutation.isPending}
-            >
-              {uploadMutation.isPending ? (
-                <CircularProgress size={24} />
-              ) : (
-                'Upload CSV'
-              )}
-              <input
-                type="file"
-                hidden
-                accept=".csv"
-                onChange={handleFileUpload}
-              />
-            </Button>
-          </Grid>
-        </Grid>
+        {error && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        {extractedSkills.length > 0 && (
+          <Box sx={{ mt: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Extracted Skills
+            </Typography>
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              {extractedSkills.map((skill, index) => (
+                <Chip
+                  key={index}
+                  label={`${skill.skill} (${(skill.confidence * 100).toFixed(0)}%)`}
+                  color="primary"
+                  variant="outlined"
+                  sx={{ m: 0.5 }}
+                />
+              ))}
+            </Stack>
+          </Box>
+        )}
       </Paper>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
-
-      {extractedSkills.length > 0 && (
-        <Paper sx={{ height: 400, width: '100%' }}>
-          <DataGrid
-            rows={extractedSkills}
-            columns={columns}
-            pageSize={5}
-            rowsPerPageOptions={[5]}
-            disableSelectionOnClick
-          />
-        </Paper>
-      )}
     </Box>
   );
 };
