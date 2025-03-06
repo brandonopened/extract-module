@@ -1,96 +1,145 @@
-# Skills Extractor UI
+# Skills Extractor Application
 
-A modern web application for extracting, analyzing, and comparing skills from job descriptions, course syllabi, and resumes.
+A web application for extracting, comparing, and analyzing skills from various sources including job postings, course syllabi, and resumes.
 
 ## Features
 
-- Extract skills from various sources:
-  - Job descriptions
-  - Course syllabi
-  - Resumes
+- Extract skills from text (job descriptions, course syllabi, resumes)
+- Upload custom skills lists via CSV
 - Compare skills across different sources
-- Visualize skill distribution and gaps
-- Modern, responsive UI built with React and Material-UI
-- Real-time skill extraction and analysis
+- Browse and search through extracted skills
+- Analyze skill gaps between job market demands and educational offerings
+
+## Prerequisites
+
+- Python 3.8 or higher
+- Node.js 14 or higher
+- npm or yarn
 
 ## Project Structure
 
 ```
-.
-├── backend/
+extract-module/
+├── backend/           # FastAPI backend
 │   ├── app/
-│   │   └── main.py
+│   │   ├── main.py   # Main application file
+│   │   └── ...
 │   └── requirements.txt
-├── frontend/
+├── frontend/         # React frontend
 │   ├── src/
-│   │   ├── components/
 │   │   ├── pages/
-│   │   └── App.tsx
+│   │   └── ...
 │   └── package.json
 └── README.md
 ```
 
-## Setup
+## Installation
 
 ### Backend Setup
 
-1. Create a Python virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-2. Install backend dependencies:
+1. Navigate to the backend directory:
    ```bash
    cd backend
-   pip install -r requirements.txt
    ```
 
-3. Start the FastAPI server:
+2. Create and activate a virtual environment:
    ```bash
-   uvicorn app.main:app --reload
+   # On macOS/Linux
+   python -m venv venv
+   source venv/bin/activate
+
+   # On Windows
+   python -m venv venv
+   .\venv\Scripts\activate
+   ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
    ```
 
 ### Frontend Setup
 
-1. Install Node.js dependencies:
+1. Navigate to the frontend directory:
    ```bash
    cd frontend
-   npm install
    ```
 
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+## Running the Application
+
+### Start the Backend Server
+
+1. Make sure you're in the backend directory with the virtual environment activated
+2. Run the FastAPI server:
+   ```bash
+   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+   ```
+   The backend will be available at `http://localhost:8000`
+
+### Start the Frontend Development Server
+
+1. In a new terminal, navigate to the frontend directory
 2. Start the development server:
    ```bash
    npm run dev
+   # or
+   yarn dev
    ```
+   The frontend will be available at `http://localhost:5173`
 
-## Usage
+## Using the Application
 
 1. Open your browser and navigate to `http://localhost:5173`
 2. Use the navigation menu to access different features:
-   - Dashboard: Overview of extracted skills and recent activities
-   - Extract Skills: Upload documents or enter text to extract skills
-   - Compare Skills: Analyze and compare skills across different sources
+   - **Extract Skills**: Paste text from job descriptions, syllabi, or resumes to extract skills
+   - **Upload Skills**: Upload CSV files containing custom skills lists
+   - **Compare Skills**: View and compare skills from different sources
+   - **Browse Skills**: Search and filter through all extracted skills
 
-## API Endpoints
+### CSV Upload Format
 
-- `POST /extract-skills`: Extract skills from text input
-- `POST /upload-file`: Extract skills from uploaded CSV files
-- `GET /health`: Check API health status
+When uploading custom skills, your CSV file should have the following format:
 
-## Technologies Used
+```csv
+Raw Skill
+Python Programming
+Data Analysis
+Machine Learning
+```
 
-- Frontend:
-  - React with TypeScript
-  - Material-UI for components
-  - Recharts for data visualization
-  - React Query for data fetching
-  - Vite for development and building
+Optional columns:
+- `Correlation Coefficient`: Confidence score (0-1)
+- `Research ID`: Unique identifier for the skill source
 
-- Backend:
-  - FastAPI
-  - LAiSER Skill Extractor
-  - Pandas for data processing
+## API Documentation
+
+Once the backend is running, you can access the API documentation at:
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
+
+## Development
+
+### Backend Development
+
+The backend is built with:
+- FastAPI - Modern Python web framework
+- Pandas - Data manipulation and analysis
+- CORS middleware for cross-origin requests
+
+### Frontend Development
+
+The frontend is built with:
+- React - UI library
+- Material-UI - Component library
+- React Router - Navigation
+- React Query - Data fetching and caching
 
 ## Contributing
 
@@ -102,4 +151,4 @@ A modern web application for extracting, analyzing, and comparing skills from jo
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
