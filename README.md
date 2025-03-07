@@ -1,100 +1,154 @@
-<div align="center">
-<img src="https://i.imgur.com/XznvjNi.png" width="70%"/>
-<h2>Leveraging ​Artificial ​Intelligence for ​Skill ​Extraction &​ Research (LAiSER)</h2>
-</div>
+# Skills Extractor Application
 
-### Contents
-LAiSER is a tool that helps learners, educators and employers share trusted and mutually intelligible information about skills​.
+A web application for extracting, comparing, and analyzing skills from various sources including job postings, course syllabi, and resumes.
 
-- [About](#about)
-- [Requirements](#requirements)
-- [Setup and Installation](#setup-and-installation)
-  - [i. Download the repository](#i-download-the-repository)
-  - [ii. Install the dependencies](#ii-install-the-dependencies)
-- [Usage](#usage)
-  - [Google Colab Setup(preferred)](#google-colab-setuppreferred)
-  - [Command Line Setup](#command-line-setup)
-- [Funding](#funding)
-- [Authors](#authors)
-- [Partners](#partners)
-<!-- - [Examples](#examples) -->
-- [Funding](#funding)
-- [Authors](#authors)
-- [Partners](#partners)
+## Features
 
-## About
-## Requirements
-- Python version >= Python 3.12. 
-- A GPU with atelast 15GB video memory is essential for running this tool on large datasets.
+- Extract skills from text (job descriptions, course syllabi, resumes)
+- Upload custom skills lists via CSV
+- Compare skills across different sources
+- Browse and search through extracted skills
+- Analyze skill gaps between job market demands and educational offerings
 
+## Prerequisites
 
-## Setup and Installation
+- Python 3.8 or higher
+- Node.js 14 or higher
+- npm or yarn
 
-### i. Download the repository
-Before proceeding to  LAiSER, you'd want to follow the steps below to install the required dependencies:
-- Clone the repository using 
-  ```shell
-  git clone https://github.com/Micah-Sanders/LAiSER.git
-  ```
-  or download the [zip(link)](https://github.com/Micah-Sanders/LAiSER/archive/refs/heads/main.zip) file and extract it.
+## Project Structure
 
-### ii. Install the dependencies
-> [!NOTE]
-> If you intend to use the Jupyter Notebook interface, you can skip this step as the dependencies will be installed seperately in the Google Colab environment.
-
-Install the required dependencies using the command below:
-  ```shell
-    pip install -r requirements.txt
 ```
-**NOTE**: Python 3.9 or later, *preferably 3.12*, is expected to be installed on your system. If you don't have Python installed, you can download it from [here](https://www.python.org/downloads/).
-
-
-## Usage
-
-As of now LAiSER can be used a command line tool or from the Jupyter notebook(Google Colab). The steps to setup the tool are as follows:
-
-### Google Colab Setup(preferred)
-LAiSER's Jupyter notebook is, currently, the fastest way to get started with the tool. You can access the notebook [here](https://github.com/LAiSER-Software/extract-module/blob/main/dev_space/Extract%20Function%20Colab%20Execution.ipynb).
-
-- Once the notebook is imported in google colaboratory, connect to a GPU-accelerated runtime(T4 GPU) and run the cells in the notebook.
-
-### Command Line Setup
-To use LAiSER as a command line tool, follow the steps below:
-
-- Navigate to the root directory of the repository and run the command below:
-  ```shell
-  python main.py
-  ```
-
-> [!CAUTION]
-> - If you encounter any `*.dll` file missing errors, make sure you downgrade the pytorch version to `2.2.2`.
-```shell
-pip install pytorch=2.2.2
+extract-module/
+├── backend/           # FastAPI backend
+│   ├── app/
+│   │   ├── main.py   # Main application file
+│   │   └── ...
+│   └── requirements.txt
+├── frontend/         # React frontend
+│   ├── src/
+│   │   ├── pages/
+│   │   └── ...
+│   └── package.json
+└── README.md
 ```
 
+## Installation
 
-<!-- ## Examples -->
+### Backend Setup
 
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
 
-## Funding
-<div align="center">
-<img src="https://i.imgur.com/XtgngBz.png" width="100px"/>
-<img src="https://i.imgur.com/a2SNYma.jpeg" width="130px"/>
-</div>
+2. Create and activate a virtual environment:
+   ```bash
+   # On macOS/Linux
+   python -m venv venv
+   source venv/bin/activate
 
-## Authors
-<a href="https://github.com/LAiSER-Software/extract-module/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=LAiSER-Software/extract-module" />
-</a>
+   # On Windows
+   python -m venv venv
+   .\venv\Scripts\activate
+   ```
 
-## Partners
-<div align="center">
-<img src="https://i.imgur.com/hMb5n6T.png" width="120px"/>
-<img src="https://i.imgur.com/dxz2Udo.png" width="70px"/>
-<img src="https://i.imgur.com/5O1EuFU.png" width="100px"/>
-</div>
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
+### Frontend Setup
 
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
 
-</br>
-<p align='center'> <b> Made with Passion💖, Data Science📊, and a little magic!🪄 </b></p>
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+## Running the Application
+
+### Start the Backend Server
+
+1. Make sure you're in the backend directory with the virtual environment activated
+2. Run the FastAPI server:
+   ```bash
+   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+   ```
+   The backend will be available at `http://localhost:8000`
+
+### Start the Frontend Development Server
+
+1. In a new terminal, navigate to the frontend directory
+2. Start the development server:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+   The frontend will be available at `http://localhost:5173`
+
+## Using the Application
+
+1. Open your browser and navigate to `http://localhost:5173`
+2. Use the navigation menu to access different features:
+   - **Extract Skills**: Paste text from job descriptions, syllabi, or resumes to extract skills
+   - **Upload Skills**: Upload CSV files containing custom skills lists
+   - **Compare Skills**: View and compare skills from different sources
+   - **Browse Skills**: Search and filter through all extracted skills
+
+### CSV Upload Format
+
+When uploading custom skills, your CSV file should have the following format:
+
+```csv
+Raw Skill
+Python Programming
+Data Analysis
+Machine Learning
+```
+
+Optional columns:
+- `Correlation Coefficient`: Confidence score (0-1)
+- `Research ID`: Unique identifier for the skill source
+
+## API Documentation
+
+Once the backend is running, you can access the API documentation at:
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
+
+## Development
+
+### Backend Development
+
+The backend is built with:
+- FastAPI - Modern Python web framework
+- Pandas - Data manipulation and analysis
+- CORS middleware for cross-origin requests
+
+### Frontend Development
+
+The frontend is built with:
+- React - UI library
+- Material-UI - Component library
+- React Router - Navigation
+- React Query - Data fetching and caching
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+This project is licensed under the MIT License.
